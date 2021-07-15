@@ -1,13 +1,125 @@
+:root {
+  --main-color: #cebaa4;
+  --main-color-active: #c27b43;
+  --main-bg: #1a1d24;
+}
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--main-bg);
+  font-family: "Jost", sans-serif !important;
+  position: relative;
+}
+.colection:hover .colection-img {
+  filter: none;
+  transform: scale(1.1);
+}
+.main-text {
+  color: var(--main-color);
+}
+.main-bg {
+  background-color: var(--main-color);
+}
+.main-text-active {
+  color: var(--main-color-active);
+}
+.main-bg-active {
+  background-color: var(--main-color-active);
+}
+.hover\:main-text:hover {
+  color: var(--main-color-active);
+}
+.hover\:main-bg:hover {
+  background-color: var(--main-color-active);
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.main-menu .active {
+  color: var(--main-color-active) !important;
+}
+.main-menu .menu-item:hover .menu-link {
+  color: var(--main-color-active) !important;
+}
+.main-menu .menu-item {
+  position: relative;
+  margin: 0 2px;
+  overflow: hidden;
+}
+.main-menu .active::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  bottom: 0;
+  border-bottom: 1px solid var(--main-color-active);
+  transition: all 0.5s linear;
+}
+.main-menu .menu-item .menu-link::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  left: -100%;
+  border-bottom: 1px solid var(--main-color-active);
+  transition: left 0.3s linear;
+}
+.main-menu .menu-item:hover .menu-link::before {
+  left: 0;
+}
+/* end css menu */
+
+.container {
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+}
+
+.product-item:hover .img-product img {
+  transform: scale(1.15);
+}
+
+.product-item:hover .add-product {
+  transform: translateY(0);
+  overflow: unset;
+  opacity: 1;
+}
+
+.product-item:hover .detail-product {
+  transform: translateY(0);
+
+  opacity: 1;
+}
+.product-item:hover .heart-product {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.product-item:hover .com-product {
+  transform: translateY(0);
+  opacity: 1;
+}
+.bg-gray {
+  background-color: var(--main-bg);
+}
+.fade {
+  animation-name: fade;
+  animation-duration: 1.5s;
+  -webkit-animation-name: fade;
+  -webkit-animation-duration: 1.5s;
+}
+
+.scrollbar-w-2::-webkit-scrollbar {
+  width: 0.3rem !important;
+  background-color: rgb(212, 209, 209) !important;
+  scrollbar-width: thin;
+}
+.scrollbar-w-2::-webkit-scrollbar-thumb {
+  background-color: rgb(161, 159, 159) !important;
+  border-radius: 6px;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
