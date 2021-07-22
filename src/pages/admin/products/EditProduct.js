@@ -12,11 +12,15 @@ import { updateProductRd } from "../../../features/products/productSlice";
 const EditProduct = () => {
   const dispatch = useDispatch();
   const [product, setProduct] = useState("");
+  const [urlImgPreview, setUrlImgPreview] = useState("");
   const { register, handleSubmit, reset } = useForm();
   const { id } = queryString.parse(useLocation().search);
   const history = useHistory();
   const [error, setError] = useState("");
   const { token, user } = isAuthenticate();
+  const onSelectFile = (e) => {
+    setUrlImgPreview(URL.createObjectURL(e.target.files[0]));
+  };
   const updateProduct = async (product) => {
     try {
       const { data } = await ProductApi.update(product, token, id, user._id);
@@ -32,8 +36,7 @@ const EditProduct = () => {
       const { data } = await ProductApi.get(id);
       const { photo, category, ...newProduct } = data;
       const { _id } = category;
-      const idCategory = { category: _id };
-      const x = { ...idCategory, ...newProduct };
+      const x = { category: _id, ...newProduct };
       setProduct(x);
       reset(x);
     };
@@ -151,7 +154,7 @@ const EditProduct = () => {
               className="py-2 px-3 rounded-lg border-2 border-gray-300 mt-1 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:border-transparent ring-opacity-50"
               cols="30"
               rows="7"
-              defaultValue={product.description || ""}
+              // defaultValue={product.description || ""}
             />
           </div>
           <div className="grid grid-cols-2 mt-5 mx-7">
@@ -276,16 +279,25 @@ const EditProduct = () => {
                   type="file"
                   {...register("photo")}
                   className="hidden"
+                  onChange={onSelectFile}
                 />
               </label>
             </div>
           </div>
           <div className="grid grid-cols-1 mt-5 mx-7">
-            <img
-              className="w-24 h-32"
-              src={`${process.env.REACT_APP_API_IMG_PRODUCT}/${product._id}`}
-              alt=""
-            />
+            {product ? (
+              <img
+                className="w-28 h-32 object-cover"
+                src={
+                  urlImgPreview
+                    ? urlImgPreview
+                    : `${process.env.REACT_APP_API_IMG_PRODUCT}/${product._id}`
+                }
+                alt=""
+              />
+            ) : (
+              ""
+            )}
           </div>
           <div className="flex items-center justify-center  md:gap-8 gap-4 pt-5 pb-5">
             <button className="w-auto bg-gray-500 hover:bg-gray-700 rounded-lg shadow-xl font-medium text-white px-4 py-2">

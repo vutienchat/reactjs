@@ -71,7 +71,7 @@ body {
   margin: 0 auto !important;
 }
 
-.product-item:hover .img-product img {
+.product-item:hover .img-product .img-main {
   transform: scale(1.15);
 }
 
@@ -83,7 +83,6 @@ body {
 
 .product-item:hover .detail-product {
   transform: translateY(0);
-
   opacity: 1;
 }
 .product-item:hover .heart-product {

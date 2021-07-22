@@ -7,7 +7,7 @@ import ReactImageZoom from "react-image-zoom";
 const Detail = () => {
   const [productDetail, setProductDetail] = useState("");
   const { productId } = useParams();
-  
+
   useEffect(() => {
     const getProductDetail = async () => {
       const { data } = await ProductApi.get(productId);
@@ -26,9 +26,7 @@ const Detail = () => {
         <div className="container pt-20 pb-10 mx-auto">
           <div className="lg:w-4/5 mx-auto flex flex-wrap">
             <div className="lg:w-2/5 w-full  h-1/2 rounded border border-[#cebaa4] overflow-hidden hover:cursor-[crosshair]">
-              {
-              productDetail ? <ReactImageZoom {...imageZoom} /> : ''
-              }
+              {productDetail ? <ReactImageZoom {...imageZoom} /> : ""}
             </div>
             {/* <img alt="ecommerce" className="lg:w-1/2 w-full object-cover object-center rounded border border-[#cebaa4]" src={`http://localhost:4000/api/product/photo/${productDetail._id}`} /> */}
             <div className="lg:w-1/2 w-full lg:pl-10 lg:py-6 mt-6 lg:mt-0">

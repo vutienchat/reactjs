@@ -4,7 +4,6 @@ const ProductApi = {
   getAll(pagination = "") {
     // const url = `/products?_expand=category`;
     const url = `/products?${pagination}`;
-
     return axiosClient.get(url);
   },
   get(id) {

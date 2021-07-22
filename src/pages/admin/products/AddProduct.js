@@ -7,13 +7,19 @@ import SelectCategory from "../../../components/admin/products/SelectCategory";
 import { isAuthenticate } from "../../../auth";
 import { useDispatch } from "react-redux";
 import { addProductRd } from "../../../features/products/productSlice";
+import playholderImg from "../../../image/playholder-img.jpg";
 const AddProduct = () => {
   const dispatch = useDispatch();
   const [error, setError] = useState("");
+  const [urlImgPreview, setUrlImgPreview] = useState(playholderImg);
   // const [success, setSuccess] = useState(false);
   const { register, handleSubmit } = useForm();
   const { token, user } = isAuthenticate();
   const history = useHistory();
+  const onSelectFile = (e) => {
+    const file = e.target.files[0];
+    setUrlImgPreview(URL.createObjectURL(file));
+  };
   const addProduct = async (product) => {
     try {
       const { data } = await ProductApi.add(product, token, user._id);
@@ -221,8 +227,18 @@ const AddProduct = () => {
                   type="file"
                   {...register("photo")}
                   className="hidden"
+                  onChange={onSelectFile}
                 />
               </label>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 mt-5 mx-7">
+            <div className="w-28 h-32">
+              <img
+                className="w-full h-full object-cover"
+                src={urlImgPreview}
+                alt=""
+              />
             </div>
           </div>
           <div className="flex items-center justify-center  md:gap-8 gap-4 pt-5 pb-5">

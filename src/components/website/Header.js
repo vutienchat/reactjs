@@ -7,7 +7,7 @@ import { isAuthenticate, signOut } from "../../auth";
 const Header = (props) => {
   const { countCart } = props;
   const [openCart, setOpenCart] = useState(false);
-  const [bgToggleActive, setbgToggleActive] = useState(false);
+  const [bgOverlay, setbgOverlay] = useState(false);
   const [fixedHeader, setFixedHeader] = useState(true);
   const [openAccount, setOpenAccount] = useState(false);
   let location = useLocation();
@@ -15,7 +15,7 @@ const Header = (props) => {
   useEffect(() => {
     setOpenAccount(false);
     setOpenCart(false);
-    setbgToggleActive(false);
+    setbgOverlay(false);
   }, [location]);
   let firstYOffset = window.pageYOffset;
   const changeFixed = () => {
@@ -30,7 +30,7 @@ const Header = (props) => {
   window.addEventListener("scroll", changeFixed);
   return (
     <>
-      {bgToggleActive ? (
+      {bgOverlay ? (
         <div className="fixed h-screen w-screen bg-black bg-opacity-50 z-20 cursor-pointer  bg-toggle-active"></div>
       ) : (
         ""
@@ -199,7 +199,7 @@ const Header = (props) => {
               className="px-2 relative"
               onClick={() => {
                 setOpenCart(true);
-                setbgToggleActive(true);
+                setbgOverlay(true);
               }}
             >
               {countCart > 0 ? (
@@ -231,7 +231,7 @@ const Header = (props) => {
         {...props}
         openCart={openCart}
         setOpenCart={setOpenCart}
-        setbgToggleActive={setbgToggleActive}
+        setbgOverlay={setbgOverlay}
       />
     </>
   );

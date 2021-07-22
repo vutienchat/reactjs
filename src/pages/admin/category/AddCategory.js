@@ -4,8 +4,13 @@ import { useHistory } from "react-router-dom";
 import { showError } from "../../../components/Alerts";
 import categoryApi from "../../../api/categoryAPI";
 import { isAuthenticate } from "../../../auth";
+import playholderImg from "../../../image/playholder-img.jpg";
 const AddCategory = () => {
   const [error, setError] = useState("");
+  const [urlImgPreview, setUrlImgPreview] = useState(playholderImg);
+  const onSelectFile = (e) => {
+    setUrlImgPreview(URL.createObjectURL(e.target.files[0]));
+  };
   // const [success, setSuccess] = useState(false);
   const history = useHistory();
   const { token, user } = isAuthenticate();
@@ -97,8 +102,18 @@ const AddCategory = () => {
                   type="file"
                   {...register("photo")}
                   className="hidden"
+                  onChange={onSelectFile}
                 />
               </label>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 mt-5 mx-7">
+            <div className="w-28 h-32">
+              <img
+                className="w-full h-full object-cover"
+                src={urlImgPreview}
+                alt=""
+              />
             </div>
           </div>
           <div className="flex items-center justify-center  md:gap-8 gap-4 pt-5 pb-5">

@@ -5,7 +5,7 @@ const MiniCart = ({
   openCart,
   setOpenCart,
   listCart,
-  setbgToggleActive,
+  setbgOverlay,
   removeCartItem,
   totalCart,
   countCart,
@@ -27,7 +27,7 @@ const MiniCart = ({
         <span
           onClick={() => {
             setOpenCart(false);
-            setbgToggleActive(false);
+            setbgOverlay(false);
           }}
         >
           <svg

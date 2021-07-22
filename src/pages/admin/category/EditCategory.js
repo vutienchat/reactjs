@@ -12,6 +12,10 @@ const EditCategory = () => {
   const history = useHistory();
   const { token, user } = isAuthenticate();
   const [error, setError] = useState("");
+  const [urlImgPreview, setUrlImgPreview] = useState("");
+  const onSelectFile = (e) => {
+    setUrlImgPreview(URL.createObjectURL(e.target.files[0]));
+  };
   const updateCategory = async (category) => {
     try {
       await categoryApi.update(category, token, id, user._id);
@@ -110,16 +114,27 @@ const EditCategory = () => {
                   type="file"
                   {...register("photo")}
                   className="hidden"
+                  onChange={onSelectFile}
                 />
               </label>
             </div>
           </div>
           <div className="grid grid-cols-1 mt-5 mx-7">
-            <img
-              className="w-24 h-32"
-              src={`${process.env.REACT_APP_API_IMG_CATEGORY}/${category._id}`}
-              alt=""
-            />
+            <div className="w-28 h-36">
+              {category ? (
+                <img
+                  className="w-full h-full object-cover"
+                  src={
+                    urlImgPreview
+                      ? urlImgPreview
+                      : `${process.env.REACT_APP_API_IMG_CATEGORY}/${category._id}`
+                  }
+                  alt=""
+                />
+              ) : (
+                ""
+              )}
+            </div>
           </div>
           <div className="flex items-center justify-center  md:gap-8 gap-4 pt-5 pb-5">
             <button className="w-auto bg-gray-500 hover:bg-gray-700 rounded-lg shadow-xl font-medium text-white px-4 py-2">
