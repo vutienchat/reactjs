@@ -15,7 +15,7 @@ const ListProduct = ({ listProduct, onCart }) => {
           {listProduct.map((product) => {
             return (
               <div className="product-item fade bg-gray" key={product._id}>
-                <div className="img-product lg:h-72 relative overflow-hidden bg-white">
+                <div className="img-product lg:h-72 relative overflow-hidden">
                   <NavLink to={`/product/${product._id}`}>
                     <Image
                       url={`${process.env.REACT_APP_API_IMG_PRODUCT}/${product._id}`}

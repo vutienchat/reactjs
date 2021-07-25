@@ -1,14 +1,45 @@
-import { createSlice } from "@reduxjs/toolkit";
-
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import ProductApi from "../../api/productAPI";
+export const fetchProducts = createAsyncThunk(
+  "product/fetchProducts",
+  async (param, thunkApi) => {
+    const { data } = await ProductApi.getAll(param);
+    return data;
+  }
+);
+export const getById = createAsyncThunk(
+  "product/getById",
+  async (param, thunkApi) => {
+    const { data } = await ProductApi.get(param);
+    return data;
+  }
+);
 export const productSlice = createSlice({
   name: "product",
-  initialState: [],
+  initialState: {
+    loading: false,
+    listProduct: {
+      itemsList: [],
+    },
+    product: "",
+    message: "",
+  },
   reducers: {
-    getList: (state, actions) => {
-      return (state = actions.payload);
+    showLoading: (state) => {
+      state.loading = true;
+    },
+    hiddenLoading: (state) => {
+      state.loading = false;
     },
     addProductRd: (state, actions) => {
       state.push(actions.payload);
+    },
+    removeProductRd: (state, actions) => {
+      state.listProduct.itemsList = state.listProduct.itemsList.filter(
+        (product) => product._id !== actions.payload
+      );
+      // console.log(xx);
+      // return {...state}
     },
     updateProductRd: (state, actions) => {
       const index = state.findIndex((items) => {
@@ -18,6 +49,36 @@ export const productSlice = createSlice({
       state[index] = actions.payload;
     },
   },
+  extraReducers: {
+    [fetchProducts.pending]: (state) => {
+      state.loading = true;
+    },
+    [fetchProducts.fulfilled]: (state, actions) => {
+      state.loading = false;
+      state.listProduct = actions.payload;
+    },
+    [fetchProducts.rejected]: (state, actions) => {
+      state.loading = false;
+      state.message = actions.error;
+    },
+    [getById.pending]: (state) => {
+      state.loading = true;
+    },
+    [getById.fulfilled]: (state, actions) => {
+      state.loading = false;
+      state.product = actions.payload;
+    },
+    [getById.rejected]: (state, actions) => {
+      state.loading = false;
+      state.message = actions.error;
+    },
+  },
 });
-export const { getList, addProductRd, updateProductRd } = productSlice.actions;
+export const {
+  showLoading,
+  hiddenLoading,
+  addProductRd,
+  updateProductRd,
+  removeProductRd,
+} = productSlice.actions;
 export default productSlice.reducer;

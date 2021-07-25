@@ -30,6 +30,7 @@ const AddCategory = () => {
     fd.append("photo", data.photo[0]);
     addCategory(fd);
   };
+  const photo = { ...register("photo") };
   return (
     <div className="w-full fade">
       {error ? showError(error) : ""}
@@ -100,9 +101,13 @@ const AddCategory = () => {
                 <input
                   name="photo"
                   type="file"
-                  {...register("photo")}
                   className="hidden"
-                  onChange={onSelectFile}
+                  onChange={(e) => {
+                    photo.onChange(e); // method from hook form register
+                    onSelectFile(e); // your method
+                  }}
+                  onBlur={photo.onBlur}
+                  ref={photo.ref}
                 />
               </label>
             </div>

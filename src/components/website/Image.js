@@ -4,10 +4,10 @@ import { Img } from "react-image";
 const Image = ({ url, classname }) => {
   return (
     <Img
-      className={classname}
+      className={`${classname} fade`}
       src={url}
       loader={
-        <div className="flex items-center justify-center h-full">
+        <div className="flex items-center justify-center h-full bg-white min-h-full">
           <img className="w-16" src={threeDot} alt="" />
         </div>
       }

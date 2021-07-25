@@ -97,12 +97,6 @@ body {
 .bg-gray {
   background-color: var(--main-bg);
 }
-.fade {
-  animation-name: fade;
-  animation-duration: 1.5s;
-  -webkit-animation-name: fade;
-  -webkit-animation-duration: 1.5s;
-}
 
 .scrollbar-w-2::-webkit-scrollbar {
   width: 0.3rem !important;
@@ -112,6 +106,12 @@ body {
 .scrollbar-w-2::-webkit-scrollbar-thumb {
   background-color: rgb(161, 159, 159) !important;
   border-radius: 6px;
+}
+.fade {
+  animation-name: fade;
+  animation-duration: 1.5s;
+  -webkit-animation-name: fade;
+  -webkit-animation-duration: 1.5s;
 }
 
 @keyframes fade {

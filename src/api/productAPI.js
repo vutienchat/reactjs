@@ -10,6 +10,10 @@ const ProductApi = {
     const url = `/products/${id}`;
     return axiosClient.get(url);
   },
+  getTotalProductByCategory() {
+    const url = `/products/totalByCategory`;
+    return axiosClient.get(url);
+  },
   getRalated(id) {
     const url = `/products/related/${id}`;
     return axiosClient.get(url);

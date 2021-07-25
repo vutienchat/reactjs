@@ -9,12 +9,12 @@ const Collection = ({ listCollection }) => {
         return (
           <div
             key={collection._id}
-            className="relative md:w-full h-full overflow-hidden colection fade bg-white"
+            className="relative md:w-full h-full overflow-hidden colection fade min-h-[100px]"
           >
             <Link to={`/category/${collection.name}?id=${collection._id}`}>
               <Image
                 url={`${process.env.REACT_APP_API_IMG_CATEGORY}/${collection._id}`}
-                classname="filter grayscale  w-full object-cover transition ease-in duration-[.4s] transform colection-img"
+                classname="filter grayscale  w-full h-full object-cover transition ease-in duration-[.4s] transform colection-img "
               />
             </Link>
             <div className="absolute left-0 bottom-0 pl-7 pb-10 md:pl-10 md:pb-10">
@@ -25,7 +25,7 @@ const Collection = ({ listCollection }) => {
                 {customName(collection.name)}
               </Link>
               <p className="font-bold text-white text-xl">
-                {collection.total} item
+                {collection.count} item
               </p>
             </div>
           </div>

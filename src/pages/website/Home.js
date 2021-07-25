@@ -17,7 +17,7 @@ const HomePage = (props) => {
 
   useEffect(() => {
     const getListCollection = async () => {
-      const { data } = await categoryApi.getAll(4);
+      const { data } = await ProductAPI.getTotalProductByCategory();
       setListCollection(data);
     };
     getListCollection();
