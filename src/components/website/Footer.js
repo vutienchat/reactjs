@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 const Footer = () => {
   return (
-    <footer>
+    <footer className="px-3 sm:px-0">
       <div className="border-t-4 border-gray-700 my-16" />
       <div className="container">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 pb-5">
@@ -33,7 +33,7 @@ const Footer = () => {
               </li>
             </ul>
           </div>
-          <div className="support flex w-full justify-center">
+          <div className="support md:flex w-full justify-center">
             <ul>
               <li className="leading-10 relative">
                 <span className="text-xl text-white">Support</span>

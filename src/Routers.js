@@ -5,6 +5,7 @@ import {
   Switch,
   Redirect,
 } from "react-router-dom";
+import ToolbarMobile from "./components/website/toolbarMobile";
 import { ScrollToTop } from "./Util";
 const LayoutAdmin = lazy(() => import("./layout/LayoutAdmin"));
 const LayoutUser = lazy(() => import("./layout/LayoutUser"));
@@ -85,6 +86,7 @@ const Routers = (props) => {
           <Route>
             <LayoutUser>
               <Header {...props} />
+              <ToolbarMobile />
               <Switch>
                 <Route exact path="/">
                   <HomePage {...props} />

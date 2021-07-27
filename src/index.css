@@ -67,10 +67,29 @@ body {
 /* end css menu */
 
 .container {
-  max-width: 1200px !important;
+  width: 100% !important;
   margin: 0 auto !important;
 }
-
+@media (min-width: 576px) {
+  .container {
+    max-width: 540px !important;
+  }
+}
+@media (min-width: 768px) {
+  .container {
+    max-width: 720px !important;
+  }
+}
+@media (min-width: 992px) {
+  .container {
+    max-width: 960px !important;
+  }
+}
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1170px !important;
+  }
+}
 .product-item:hover .img-product .img-main {
   transform: scale(1.15);
 }

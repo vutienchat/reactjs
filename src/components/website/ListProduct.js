@@ -15,14 +15,14 @@ const ListProduct = ({ listProduct, onCart }) => {
           {listProduct.map((product) => {
             return (
               <div className="product-item fade bg-gray" key={product._id}>
-                <div className="img-product lg:h-72 relative overflow-hidden">
+                <div className="img-product h-56 sm:h-80 lg:h-72 relative overflow-hidden bg-gray-400">
                   <NavLink to={`/product/${product._id}`}>
                     <Image
                       url={`${process.env.REACT_APP_API_IMG_PRODUCT}/${product._id}`}
                       classname="object-cover transition duration-500 w-full h-full absolute top-0 left-0 img-main"
                     />
                   </NavLink>
-                  <div className="product-action absolute bottom-2 w-full">
+                  <div className="product-action absolute bottom-2 w-full hidden sm:block">
                     <div className="flex justify-center ">
                       <span
                         onClick={() => addCart(product._id)}
@@ -95,13 +95,29 @@ const ListProduct = ({ listProduct, onCart }) => {
                   </div>
                 </div>
                 <div className="content-product pt-3">
-                  <div className="name-product">
+                  <div className="name-product flex  justify-between">
                     <NavLink
                       className="text-white hover:text-yellow-600"
                       to={`/product/${product._id}`}
                     >
                       {customName(product.name)}
                     </NavLink>
+                    <span className="pl-2 sm:pl-0 sm:hidden">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-white"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="1.5"
+                          d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                        />
+                      </svg>
+                    </span>
                   </div>
                   <div className="flex justify-between items-center mt-5 flex-wrap">
                     <div className="star-product flex">

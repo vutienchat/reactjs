@@ -12,7 +12,7 @@ const MainMenu = () => {
     getNameCategory();
   }, []);
   return (
-    <nav>
+    <nav className="hidden lg:block">
       <ul className="main-menu flex">
         <li className="menu-item">
           <NavLink exact className="px-3 menu-link main-text" to="/">
