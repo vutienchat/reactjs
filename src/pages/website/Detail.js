@@ -1,17 +1,74 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import ProductApi from "../../api/productAPI";
 import Related from "../../components/website/detail/Related";
 import { customName } from "../../Util";
 import ReactImageZoom from "react-image-zoom";
+import { useDispatch, useSelector } from "react-redux";
+import { getById } from "../../features/products/productSlice";
+import { addCart } from "../../features/cart/cartSlice";
+import Swal from "sweetalert2";
 const Detail = () => {
-  const [productDetail, setProductDetail] = useState("");
+  const { product, loading } = useSelector((state) => state.product);
+  const { loading: loadingAddCart } = useSelector((state) => state.cart);
+  const productDetail = product;
+  const dispatch = useDispatch();
   const { productId } = useParams();
-
+  const [quantityProduct, setQuantityProduct] = useState(1);
+  const editQtyMinus = () => {
+    if (quantityProduct > 1) {
+      setQuantityProduct(quantityProduct - 1);
+    }
+  };
+  const editQtyplus = () => {
+    if (quantityProduct < productDetail.quantity)
+      setQuantityProduct(quantityProduct + 1);
+  };
+  const addToCart = async () => {
+    await dispatch(
+      addCart({ ...productDetail, quantityCart: quantityProduct })
+    );
+    await Swal.fire({
+      background: "#1a1d24",
+      // showCloseButton: true,
+      width: 700,
+      timer: 3000,
+      showCancelButton: true,
+      html: `
+      <div class="modal-cart text-left">
+        <div
+          class="modal-cart-header text-white border-b border-[#cebaa4] pb-4"
+        >
+          ${quantityProduct} Item added to your cart
+        </div>
+        <div class="flex py-5 border-b border-[#cebaa4]">
+          <div class="img-modalCart">
+            <img
+              class="w-28 object-cover h-full"
+              src="	https://binshop.herokuapp.com/api/product/photo/${
+                productDetail._id
+              }"
+            />
+          </div>
+          <div class="info-modal-cart pl-3">
+            <div class="text-white">${productDetail.name}</div>
+            <p class="text-[#707070]">Quantity: ${quantityProduct}</p>
+            <div>
+              <span class="text-[#707070]">Cart Subtotal: </span
+              ><span class="main-text-active">${new Intl.NumberFormat("de-DE", {
+                style: "currency",
+                currency: "EUR",
+              }).format(quantityProduct * productDetail.new_price)}</span>
+            </div>
+          </div>
+        </div>
+        </div>
+        `,
+      showConfirmButton: false,
+    });
+  };
   useEffect(() => {
     const getProductDetail = async () => {
-      const { data } = await ProductApi.get(productId);
-      setProductDetail(data);
+      dispatch(getById(productId));
     };
     getProductDetail();
   }, [productId]);
@@ -20,15 +77,21 @@ const Detail = () => {
     zoomPosition: "original",
     img: `${process.env.REACT_APP_API_IMG_PRODUCT}/${productDetail._id}`,
   };
-  return (
-    <div className="container">
+  return loading ? (
+    <div className="h-full flex items-center justify-center">
+      <img
+        src="https://img.pikbest.com/58pic/35/39/61/62K58PICb88i68HEwVnm5_PIC2018.gif!w340"
+        alt=""
+      />
+    </div>
+  ) : (
+    <div className="container fade">
       <section className=" overflow-hidden">
         <div className="container pt-20 pb-10 mx-auto">
           <div className="lg:w-4/5 mx-auto flex flex-wrap">
             <div className="lg:w-2/5 w-full  h-1/2 rounded border border-[#cebaa4] overflow-hidden hover:cursor-[crosshair]">
               {productDetail ? <ReactImageZoom {...imageZoom} /> : ""}
             </div>
-            {/* <img alt="ecommerce" className="lg:w-1/2 w-full object-cover object-center rounded border border-[#cebaa4]" src={`http://localhost:4000/api/product/photo/${productDetail._id}`} /> */}
             <div className="lg:w-1/2 w-full lg:pl-10 lg:py-6 mt-6 lg:mt-0">
               <h2 className="text-sm title-font text-gray-500 tracking-widest">
                 BRAND NAME
@@ -135,24 +198,65 @@ const Detail = () => {
                 </span>
               </div>
               <div className="text-[#c27b43] text-2xl">
-                {productDetail.new_price}
+                {new Intl.NumberFormat("de-DE", {
+                  style: "currency",
+                  currency: "EUR",
+                }).format(productDetail.new_price)}
               </div>
               <div>
-                <div className="flex flex-row my-5">
-                  <div className=" border border-[#cebaa4]  text-[#cebaa4] hover:text-white hover:bg-[#cebaa4] h-14 w-14 flex cursor-pointer">
+                <div className="flex flex-row my-3">
+                  <div
+                    className=" border border-[#cebaa4]  text-[#cebaa4] hover:text-white hover:bg-[#cebaa4] h-14 w-14 flex cursor-pointer"
+                    onClick={editQtyMinus}
+                  >
                     <span className="m-auto">-</span>
                   </div>
                   <input
                     type="number"
-                    value="1"
+                    min="0"
+                    max={productDetail.quantity}
+                    value={quantityProduct}
                     className="pl-2.5 text-xs text-white md:text-base bg-transparent h-14 w-14 border border-[#cebaa4] focus:outline-none text-center transform mn"
                     readOnly
                   />
-                  <div className=" border border-[#cebaa4]  text-[#cebaa4] hover:text-white hover:bg-[#cebaa4] h-14 w-14 flex  cursor-pointer">
+                  <div
+                    className=" border border-[#cebaa4]  text-[#cebaa4] hover:text-white hover:bg-[#cebaa4] h-14 w-14 flex  cursor-pointer"
+                    onClick={editQtyplus}
+                  >
                     <span className="m-auto">+</span>
                   </div>
                 </div>
               </div>
+              <button
+                disabled={loadingAddCart}
+                className="disabled:cursor-not-allowed add-to-cart main-bg h-[54px] w-full hover:main-bg text-white flex items-center justify-center transition duration-500 cursor-pointer text-[14px] focus:outline-none "
+                onClick={addToCart}
+              >
+                {loadingAddCart ? (
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                ) : (
+                  <div className="fade">ADD TO CART</div>
+                )}
+              </button>
               <p className="leading-relaxed text-[#707070]">
                 {productDetail.description}
               </p>

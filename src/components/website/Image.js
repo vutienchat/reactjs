@@ -7,8 +7,8 @@ const Image = ({ url, classname }) => {
       className={`${classname} fade`}
       src={url}
       loader={
-        <div className="flex items-center justify-center h-full bg-white min-h-full">
-          <img className="w-16" src={threeDot} alt="" />
+        <div className="flex items-center justify-center h-full bg-white min-h-[100px]">
+          <img className="w-12" src={threeDot} alt="" />
         </div>
       }
     />

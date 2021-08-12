@@ -2,18 +2,53 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import ProductApi from "../../api/productAPI";
 export const fetchProducts = createAsyncThunk(
   "product/fetchProducts",
-  async (param, thunkApi) => {
+  async (param) => {
     const { data } = await ProductApi.getAll(param);
     return data;
   }
 );
-export const getById = createAsyncThunk(
-  "product/getById",
-  async (param, thunkApi) => {
-    const { data } = await ProductApi.get(param);
-    return data;
+export const removeProduct = createAsyncThunk(
+  "product/removeProduct",
+  async ({ token, id, userId }, { rejectWithValue }) => {
+    try {
+      const { data } = await ProductApi.delete(token, id, userId);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response.data.error);
+    }
   }
 );
+export const addProducts = createAsyncThunk(
+  "product/addProducts",
+  async ({ product, token, id }, { rejectWithValue }) => {
+    try {
+      const { data } = await ProductApi.add(product, token, id);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response.data.error);
+    }
+  }
+);
+export const updateProduct = createAsyncThunk(
+  "product/updateProduct",
+  async ({ product, token, productId, userId }, { rejectWithValue }) => {
+    try {
+      const { data } = await ProductApi.update(
+        product,
+        token,
+        productId,
+        userId
+      );
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response.data.error);
+    }
+  }
+);
+export const getById = createAsyncThunk("product/getById", async (param) => {
+  const { data } = await ProductApi.get(param);
+  return data;
+});
 export const productSlice = createSlice({
   name: "product",
   initialState: {
@@ -61,6 +96,16 @@ export const productSlice = createSlice({
       state.loading = false;
       state.message = actions.error;
     },
+    [addProducts.pending]: (state) => {
+      state.loading = true;
+    },
+    [addProducts.fulfilled]: (state, actions) => {
+      state.loading = false;
+      // state.listProduct = actions.payload;
+    },
+    [addProducts.rejected]: (state, actions) => {
+      state.loading = false;
+    },
     [getById.pending]: (state) => {
       state.loading = true;
     },
@@ -71,6 +116,28 @@ export const productSlice = createSlice({
     [getById.rejected]: (state, actions) => {
       state.loading = false;
       state.message = actions.error;
+    },
+
+    [removeProduct.pending](state) {
+      state.loading = true;
+    },
+    [removeProduct.fulfilled](state, actions) {
+      state.loading = false;
+      state.listProduct.itemsList = state.listProduct.itemsList.filter(
+        (product) => product._id !== actions.payload._id
+      );
+    },
+    [removeProduct.rejected](state) {
+      state.loading = false;
+    },
+    [updateProduct.pending](state) {
+      state.loading = true;
+    },
+    [updateProduct.fulfilled](state, actions) {
+      state.loading = false;
+    },
+    [updateProduct.rejected](state) {
+      state.loading = false;
     },
   },
 });

@@ -114,6 +114,7 @@ const Routers = (props) => {
                   <Erroro404Page />
                 </Route>
               </Switch>
+
               <Footer />
             </LayoutUser>
           </Route>

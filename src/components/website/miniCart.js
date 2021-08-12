@@ -1,28 +1,61 @@
 import React from "react";
 import { customName } from "../../Util";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { editCart, removeCart } from "../../features/cart/cartSlice";
 const MiniCart = ({
   openCart,
   setOpenCart,
-  listCart,
+  // listCart,
   setbgOverlay,
-  removeCartItem,
-  totalCart,
-  countCart,
+  // totalCart,
+  // countCart,
 }) => {
+  const { listCart, loading, countCart, totalCart } = useSelector(
+    (state) => state.cart
+  );
+  const dispatch = useDispatch();
   const remove = (id) => {
-    removeCartItem(id);
+    dispatch(removeCart(id));
   };
-  const plusCart = (e) => {
-    console.log(e.currentTarget.getAttribute("data-id"));
+
+  const updateCart = (dataEdit, qtyEdit) => {
+    dispatch(editCart({ ...dataEdit, quantityCart: qtyEdit }));
   };
+
   return (
     <div
-      className={`mini-cart fixed w-full sm:w-4/6 md:w-2/6 bg-white h-screen top-0 right-0 z-20   transition duration-500 ${
-        openCart ? "" : " transform translate-x-full"
+      className={`mini-cart relative fixed w-full sm:w-4/6 md:w-2/6 bg-white h-screen top-0 right-0 z-20 transition duration-500 ${
+        openCart ? "" : "relative transform translate-x-full"
       } `}
     >
-      <div className="header-cart-title flex items-center justify-between bg-gray-300 px-2 md:px-5 h-20">
+      {loading ? (
+        <div className="absolute top-0 left-0 w-full h-full bg-white bg-opacity-70 flex items-center justify-center fade">
+          <svg
+            className="animate-spin h-7 w-7 main-text-active"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+        </div>
+      ) : (
+        ""
+      )}
+      <div className="header-cart-title  flex items-center justify-between bg-gray-300 px-2 md:px-5 h-20">
         <span>Shopping Cart ({countCart})</span>
         <span
           onClick={() => {
@@ -32,7 +65,7 @@ const MiniCart = ({
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
+            className="h-5 w-5 cursor-pointer"
             viewBox="0 0 20 20"
             fill="currentColor"
           >
@@ -69,7 +102,7 @@ const MiniCart = ({
                         <span onClick={() => remove(cartItem._id)}>
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className="h-3 w-3 text-gray-500"
+                            className="h-3 w-3 text-gray-500 cursor-pointer"
                             viewBox="0 0 20 20"
                             fill="currentColor"
                           >
@@ -85,29 +118,33 @@ const MiniCart = ({
                         <span>
                           <div className="flex flex-row border border-[#cebaa4]">
                             <div
+                              onClick={() => updateCart(cartItem, -1)}
                               data-id={cartItem._id}
-                              className="text-[#cebaa4] hover:text-white hover:bg-[#cebaa4] h-7 w-7 flex cursor-pointer"
+                              className="text-[#cebaa4] hover:text-white hover:bg-[#cebaa4] h-7 w-7 text-center cursor-pointer"
                             >
                               <span className="m-auto">-</span>
                             </div>
                             <input
                               data-id={cartItem._id}
-                              type="number"
+                              type="text"
                               value={cartItem.quantityCart}
-                              className=" text-xs md:text-base bg-transparent h-7 w-7 focus:outline-none pl-1.5"
+                              className=" text-xs md:text-base text-center block w-7  focus:outline-none "
                               readOnly
                             />
                             <div
                               data-id={cartItem._id}
-                              onClick={plusCart}
-                              className="text-[#cebaa4] hover:text-white hover:bg-[#cebaa4] h-7 w-7 flex  cursor-pointer"
+                              onClick={() => updateCart(cartItem, 1)}
+                              className="text-[#cebaa4] hover:text-white hover:bg-[#cebaa4] h-7 w-7 text-center  cursor-pointer"
                             >
                               <span className="m-auto">+</span>
                             </div>
                           </div>
                         </span>
                         <span className="cart-item-price text-gray-500">
-                          {cartItem.quantityCart * cartItem.new_price}
+                          {new Intl.NumberFormat("de-DE", {
+                            style: "currency",
+                            currency: "EUR",
+                          }).format(cartItem.quantityCart * cartItem.new_price)}
                         </span>
                       </div>
                     </div>
@@ -117,7 +154,12 @@ const MiniCart = ({
             </div>
             <div className="total-cart flex items-center justify-between py-8">
               <span>Subtotal</span>
-              <span className="text-gray-500">{totalCart}</span>
+              <span className="text-gray-500">
+                {new Intl.NumberFormat("de-DE", {
+                  style: "currency",
+                  currency: "EUR",
+                }).format(totalCart)}
+              </span>
             </div>
             <div className="mini-cart-actions">
               <div className="checkout w-full bg-yellow-700 bg-opacity-75 h-16 flex items-center justify-center">

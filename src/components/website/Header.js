@@ -4,8 +4,9 @@ import { NavLink, Link } from "react-router-dom";
 import { useLocation, useHistory } from "react-router-dom";
 import MiniCart from "./miniCart";
 import { isAuthenticate, signOut } from "../../auth";
+import { useSelector } from "react-redux";
 const Header = (props) => {
-  const { countCart } = props;
+  const { countCart } = useSelector((state) => state.cart);
   const [openCart, setOpenCart] = useState(false);
   const [bgOverlay, setbgOverlay] = useState(false);
   const [fixedHeader, setFixedHeader] = useState(true);
@@ -218,13 +219,10 @@ const Header = (props) => {
                 setbgOverlay(true);
               }}
             >
-              {countCart > 0 ? (
-                <span className="absolute rounded-full main-bg-active w-4 h-4 text-xs -top-1/2 right-0 text-center text-white">
-                  {countCart}
-                </span>
-              ) : (
-                ""
-              )}
+              <span className="absolute rounded-full main-bg-active w-4 h-4 text-xs -top-1/2 right-0 text-center text-white">
+                {countCart}
+              </span>
+
               <svg
                 className="w-5 main-text hover:main-text transition duration-500 cursor-pointer"
                 xmlns="http://www.w3.org/2000/svg"

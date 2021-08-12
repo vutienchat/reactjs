@@ -1,12 +1,76 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { NavLink } from "react-router-dom";
-import { customName } from "../../Util";
+import {
+  customName,
+  setCartLocalStorage,
+  totalCartLocalStorage,
+} from "../../Util";
 import Image from "./Image";
-// import { Image } from "./Image";
 import threeDot from "../../image/three-dots-black.svg";
+import { useDispatch, useSelector } from "react-redux";
+import { addCart, countCart, totalCart } from "../../features/cart/cartSlice";
+import Swal from "sweetalert2";
+import { Link } from "react-router-dom";
 const ListProduct = ({ listProduct, onCart }) => {
-  const addCart = (id) => {
-    onCart(id);
+  const { listCart, loading } = useSelector((state) => state.cart);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    setCartLocalStorage(listCart);
+    dispatch(countCart(listCart));
+    dispatch(totalCart(listCart));
+  }, [listCart]);
+  const addItem = async (product) => {
+    const quantityCart = 1;
+    await dispatch(addCart({ ...product, quantityCart }));
+
+    await Swal.fire({
+      background: "#1a1d24",
+      // showCloseButton: true,
+      width: 700,
+      timer: 3000,
+      showCancelButton: true,
+      html: `
+        <div class="modal-cart text-left">
+          <div
+            class="modal-cart-header text-white border-b border-[#cebaa4] pb-4"
+          >
+            ${quantityCart} Item added to your cart
+          </div>
+          <div class="flex py-5 border-b border-[#cebaa4]">
+            <div class="img-modalCart">
+              <img
+                class="w-28 object-cover h-full"
+                src="	https://binshop.herokuapp.com/api/product/photo/${
+                  product._id
+                }"
+              />
+            </div>
+            <div class="info-modal-cart pl-3">
+              <div class="text-white">${product.name}</div>
+              <p class="text-[#707070]">Quantity: ${quantityCart}</p>
+              <div>
+                <span class="text-[#707070]">Cart Subtotal: </span
+                ><span class="main-text-active">${new Intl.NumberFormat(
+                  "de-DE",
+                  {
+                    style: "currency",
+                    currency: "EUR",
+                  }
+                ).format(quantityCart * product.new_price)}</span>
+              </div>
+            </div>
+          </div>
+          </div>
+          `,
+      // <div class="modal-cart-footer flex pt-5">
+
+      //  <Link to="">
+      //  <div class="bg-white py-3 px-4 main-text" >continue shopping</div>
+      //  </Link>
+      //   <Link to=""><div class="main-bg-active py-3 px-4 text-white" >proceed to cart</div></Link>
+      // </div>
+      showConfirmButton: false,
+    });
   };
   if (listProduct.length > 0) {
     return (
@@ -24,25 +88,49 @@ const ListProduct = ({ listProduct, onCart }) => {
                   </NavLink>
                   <div className="product-action absolute bottom-2 w-full hidden sm:block">
                     <div className="flex justify-center ">
-                      <span
-                        onClick={() => addCart(product._id)}
-                        className="cursor-pointer main-bg-active p-3 mx-0.5 hover:main-bg main-text hover:text-white transition duration-500 transform translate-y-full opacity-0  add-product"
+                      <button
+                        disabled={loading}
+                        onClick={() => addItem(product)}
+                        className="disabled:cursor-not-allowed cursor-pointer main-bg-active p-3 mx-0.5 hover:main-bg main-text hover:text-white transition duration-500 transform translate-y-full opacity-0  add-product focus:outline-none"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="1.5"
-                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                          />
-                        </svg>
-                      </span>
+                        {loading ? (
+                          <svg
+                            className="animate-spin h-5 w-5 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                        ) : (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="1.5"
+                              d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                            />
+                          </svg>
+                        )}
+                      </button>
                       <span className="cursor-pointer bg-white p-3 mx-0.5 hover:main-bg main-text hover:text-white transition duration-500 transform translate-y-full opacity-0 delay-100  detail-product">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -102,65 +190,27 @@ const ListProduct = ({ listProduct, onCart }) => {
                     >
                       {customName(product.name)}
                     </NavLink>
-                    <span className="pl-2 sm:pl-0 sm:hidden">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 text-white"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="1.5"
-                          d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                        />
-                      </svg>
+                    <span className="pl-2 sm:pl-0 sm:hidden text-white">
+                      <i className="bi bi-basket text-sm"></i>
                     </span>
                   </div>
                   <div className="flex justify-between items-center mt-5 flex-wrap">
                     <div className="star-product flex">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 main-text hover:main-text cursor-pointer"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 main-text hover:main-text cursor-pointer"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 main-text hover:main-text cursor-pointer"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 main-text hover:main-text cursor-pointer"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 main-text hover:main-text cursor-pointer"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
+                      <span className="main-text text-md cursor-pointer pr-1">
+                        <i className="bi bi-star-fill"></i>
+                      </span>
+                      <span className="main-text text-md cursor-pointer pr-1">
+                        <i className="bi bi-star-fill"></i>
+                      </span>
+                      <span className="main-text text-md cursor-pointer pr-1">
+                        <i className="bi bi-star-fill"></i>
+                      </span>
+                      <span className="main-text text-md cursor-pointer pr-1">
+                        <i className="bi bi-star-fill"></i>
+                      </span>
+                      <span className="main-text text-md cursor-pointer pr-1">
+                        <i className="bi bi-star-fill"></i>
+                      </span>
                     </div>
                     <div className="price-product text-yellow-600">
                       {new Intl.NumberFormat("de-DE", {

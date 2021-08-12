@@ -1,7 +1,9 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { customName } from "../../../Util";
 
-const InfoOrder = ({ listCart, totalCart }) => {
+const InfoOrder = () => {
+  const { listCart, totalCart } = useSelector((state) => state.cart);
   return (
     <div className="border-2 border-[#cebaa4] p-4 mt-4">
       <div className="text-2xl mb-4 font-semibold text-white">

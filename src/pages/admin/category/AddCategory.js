@@ -2,38 +2,64 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useHistory } from "react-router-dom";
 import { showError } from "../../../components/Alerts";
-import categoryApi from "../../../api/categoryAPI";
+import imgLoading from "../../../image/Ajux_loader.gif";
 import { isAuthenticate } from "../../../auth";
 import playholderImg from "../../../image/playholder-img.jpg";
+import { useDispatch, useSelector } from "react-redux";
+import { addCategory } from "../../../features/category/categorySlice";
+import Swal from "sweetalert2";
+import { unwrapResult } from "@reduxjs/toolkit";
 const AddCategory = () => {
   const [error, setError] = useState("");
   const [urlImgPreview, setUrlImgPreview] = useState(playholderImg);
   const onSelectFile = (e) => {
     setUrlImgPreview(URL.createObjectURL(e.target.files[0]));
   };
-  // const [success, setSuccess] = useState(false);
+  const { loading } = useSelector((state) => state.category);
+  const dispatch = useDispatch();
   const history = useHistory();
   const { token, user } = isAuthenticate();
   const { register, handleSubmit } = useForm();
-  const addCategory = async (category) => {
+  const add = async (category) => {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 3000,
+    });
     try {
-      await categoryApi.add(category, token, user._id);
+      const resultAction = await dispatch(
+        addCategory({ category, token, id: user._id })
+      );
+      unwrapResult(resultAction);
+      Toast.fire({
+        icon: "success",
+        title: "Thêm danh mục Thành công",
+      });
       history.push("/admin/category");
     } catch (error) {
-      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-      setError(error.response.data.error);
+      Toast.fire({
+        icon: "error",
+        title: error,
+      });
     }
+    // try {
+    //   await categoryApi.add(category, token, user._id);
+    // } catch (error) {
+    //   window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    //   setError(error.response.data.error);
+    // }
   };
   const onHandleSubmit = (data) => {
     const fd = new FormData();
     fd.append("name", data.name);
     fd.append("photo", data.photo[0]);
-    addCategory(fd);
+    add(fd);
   };
   const photo = { ...register("photo") };
   return (
     <div className="w-full fade">
-      {error ? showError(error) : ""}
+      {/* {error ? showError(error) : ""} */}
       <form onSubmit={handleSubmit(onHandleSubmit)}>
         <div className="grid bg-white rounded-lg shadow-xl">
           <div className="flex justify-center py-4">
@@ -125,7 +151,31 @@ const AddCategory = () => {
             <button className="w-auto bg-gray-500 hover:bg-gray-700 rounded-lg shadow-xl font-medium text-white px-4 py-2">
               Cancel
             </button>
-            <button className="w-auto bg-purple-500 hover:bg-purple-700 rounded-lg shadow-xl font-medium text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-700 focus:border-purple-700 ring-opacity-50">
+            <button className=" inline-flex items-center w-auto bg-purple-500 hover:bg-purple-700 rounded-lg shadow-xl font-medium text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-700 focus:border-purple-700 ring-opacity-50">
+              {loading ? (
+                <svg
+                  className="animate-spin h-5 w-5 text-white mr-2"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+              ) : (
+                ""
+              )}
               Add Category
             </button>
           </div>

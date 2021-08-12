@@ -38,9 +38,11 @@ export const totalCartLocalStorage = () => {
   }, 0);
   return result;
 };
-export const countCartLocalStorage = () => {
-  const result = getCartLocalStorage().reduce((accumulator, cart) => {
-    return accumulator + cart.quantityCart;
-  }, 0);
-  return result;
+export const countCartLocalStorage = (data) => {
+  if (data) {
+    const result = data.reduce((accumulator, cart) => {
+      return accumulator + cart.quantityCart;
+    }, 0);
+    return result;
+  }
 };

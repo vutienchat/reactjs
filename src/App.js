@@ -1,25 +1,17 @@
 import React, { useState } from "react";
 import ProductApi from "./api/productAPI";
 import Routers from "./Routers";
+import "bootstrap-icons/font/bootstrap-icons.css";
 import {
   countCartLocalStorage,
   getCartLocalStorage,
   setCartLocalStorage,
   totalCartLocalStorage,
 } from "./Util";
-// import Colection from './components/Colection'
-// import Header from './components/Header'
 const App = () => {
   const [listCart, setListCart] = useState(getCartLocalStorage());
   const [countCart, setCountCart] = useState(countCartLocalStorage());
   const [totalCart, setTotalCart] = useState(totalCartLocalStorage());
-  // useEffect(() => {
-  //   const fetchListProduct = async () => {
-  //     const { data } = await ProductApi.getAll();
-  //     dispatch(getList(data.itemsList));
-  //   };
-  //   fetchListProduct();
-  // }, []);
   const getproduct = async (id) => {
     try {
       const { data } = await ProductApi.get(id);
@@ -42,14 +34,14 @@ const App = () => {
       setListCart(updateCart);
       setCartLocalStorage(updateCart);
     }
-    setCountCart(countCartLocalStorage());
+    // setCountCart(countCartLocalStorage());
     setTotalCart(totalCartLocalStorage());
   };
   const removeCartItem = (id) => {
     const newCart = listCart.filter((list) => list._id !== id);
     setListCart(newCart);
     setCartLocalStorage(newCart);
-    setCountCart(countCartLocalStorage());
+    // setCountCart(countCartLocalStorage());
     setTotalCart(totalCartLocalStorage());
   };
   return (

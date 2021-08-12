@@ -1,50 +1,72 @@
 import React, { lazy, useEffect, useState } from "react";
 import queryString from "query-string";
 import { useLocation } from "react-router-dom";
-import ProductApi from "../../../api/productAPI";
 import { useForm } from "react-hook-form";
 import { useHistory } from "react-router-dom";
-import SelectCategory from "../../../components/admin/products/SelectCategory";
+// import SelectCategory from "../../../components/admin/products/SelectCategory";
 import { isAuthenticate } from "../../../auth";
-import { showError } from "../../../components/Alerts";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getById,
-  updateProductRd,
+  updateProduct,
 } from "../../../features/products/productSlice";
+import { getListCategory } from "../../../features/category/categorySlice";
+import { customName } from "../../../Util";
+import { unwrapResult } from "@reduxjs/toolkit";
+import Swal from "sweetalert2";
+import imgLoading from "../../../image/Ajux_loader.gif";
 const EditProduct = () => {
-  const product = useSelector((state) => state.product);
+  const { product, loading } = useSelector((state) => state.product);
+  const { listCategory } = useSelector((state) => state.category);
   const dispatch = useDispatch();
   const [urlImgPreview, setUrlImgPreview] = useState("");
   const { register, handleSubmit, reset } = useForm();
   const { id } = queryString.parse(useLocation().search);
   const history = useHistory();
-  const [error, setError] = useState("");
   const { token, user } = isAuthenticate();
   const onSelectFile = (e) => {
     setUrlImgPreview(URL.createObjectURL(e.target.files[0]));
   };
-  const updateProduct = async (product) => {
+  const update = async (product) => {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 3000,
+    });
     try {
-      const { data } = await ProductApi.update(product, token, id, user._id);
-      // dispatch(updateProductRd(data));
+      const resultAction = await dispatch(
+        updateProduct({ product, token, productId: id, userId: user._id })
+      );
+      unwrapResult(resultAction);
+      Toast.fire({
+        icon: "success",
+        title: "Sửa danh mục Thành công",
+      });
+      // const { data } = await ProductApi.update(product, token, id, user._id);
       history.push("/admin/product");
     } catch (error) {
-      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-      setError(error.response.data.error);
+      Toast.fire({
+        icon: "error",
+        title: error,
+      });
     }
   };
   useEffect(() => {
-    const productEdit = async () => {
-      const { payload } = await dispatch(getById(id));
-      const { photo, category, ...newProduct } = payload;
-      const { _id } = category;
-      const x = { category: _id, ...newProduct };
-      reset(x);
-      console.log("getById xong");
+    const productEdit = () => {
+      dispatch(getById(id));
+      dispatch(getListCategory());
     };
     productEdit();
   }, [id, dispatch]);
+  useEffect(() => {
+    if (product) {
+      const { photo, category, ...newProduct } = product;
+      const { _id } = category;
+      const x = { category: _id, ...newProduct };
+      reset(x);
+    }
+  }, [product]);
 
   const onHandleSubmit = (data) => {
     const fd = new FormData();
@@ -59,20 +81,17 @@ const EditProduct = () => {
       fd.append("photo", data.photo[0]);
     }
     fd.append("category", data.category);
-    updateProduct(fd);
+    update(fd);
   };
   const photo = { ...register("photo") };
   return (
     <>
-      {product.loading ? (
-        <img
-          className="w-16 absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-1/2"
-          src="https://kif.info.pl/file/2018/12/lg.ring-loading-gif.gif"
-          alt=""
-        />
-      ) : product.product ? (
+      {loading ? (
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 ">
+          <img className="w-28" src={imgLoading} alt="" />
+        </div>
+      ) : product ? (
         <div className="w-full fade">
-          {error ? showError(error) : ""}
           <form onSubmit={handleSubmit(onHandleSubmit)}>
             <div className="grid bg-white rounded-lg shadow-xl">
               <div className="flex justify-center py-4">
@@ -140,15 +159,25 @@ const EditProduct = () => {
                   Category
                 </label>
                 <select
-                  // defaultValue={product.product.category}
                   {...register("category")}
                   className="py-2 px-3 rounded-lg border-2 border-gray-300 mt-1 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:border-transparent ring-opacity-50 text-gray-400"
                 >
-                  {/* <option hidden="">--- Chọn danh mục ---</option>
+                  {/* <option hidden>--- Chọn danh mục ---</option>
                   <option value="60efe08937ca6821680755fd">Beer</option>
                   <option value="60eff3b734be8623b8038e02">Liqueurs</option>
                   <option value="60eff3f634be8623b8038e03">Wines</option> */}
-                  <SelectCategory editId={product.product.category} />
+                  <>
+                    <option hidden>--- Chọn danh mục ---</option>
+                    {listCategory &&
+                      listCategory.map((category, i) => {
+                        return (
+                          <option key={i} value={category._id}>
+                            {customName(category.name)}
+                          </option>
+                        );
+                      })}
+                  </>
+                  {/* <SelectCategory editId={product.category} /> */}
                 </select>
               </div>
               <div className="grid grid-cols-1 mt-5 mx-7">
@@ -182,7 +211,7 @@ const EditProduct = () => {
                   <div className="flex mt-2">
                     <span className="flex items-center pr-2">
                       <label htmlFor="classify1">Đặc Biệt</label>
-                      {product.product.classify === 1 ? (
+                      {product.classify === 1 ? (
                         <input
                           type="radio"
                           value="1"
@@ -201,7 +230,7 @@ const EditProduct = () => {
                     </span>
                     <span className="flex items-center">
                       <label htmlFor="classify2">Bình Thường</label>
-                      {product.product.classify === 0 ? (
+                      {product.classify === 0 ? (
                         <input
                           type="radio"
                           defaultChecked
@@ -227,7 +256,7 @@ const EditProduct = () => {
                   <div className="flex mt-2">
                     <span className="flex items-center  pr-2">
                       <label htmlFor="shipping2"> Chưa Hoàn Thành</label>
-                      {product.product.shipping ? (
+                      {product.shipping ? (
                         <input
                           value="0"
                           {...register("shipping", { required: true })}
@@ -246,7 +275,7 @@ const EditProduct = () => {
                     </span>
                     <span className="flex items-center">
                       <label htmlFor="shipping1">Hoàn Thành</label>
-                      {product.product.shipping ? (
+                      {product.shipping ? (
                         <input
                           value="1"
                           defaultChecked
@@ -312,7 +341,7 @@ const EditProduct = () => {
                     src={
                       urlImgPreview
                         ? urlImgPreview
-                        : `${process.env.REACT_APP_API_IMG_PRODUCT}/${product.product._id}`
+                        : `${process.env.REACT_APP_API_IMG_PRODUCT}/${product._id}`
                     }
                     alt=""
                   />
@@ -333,7 +362,7 @@ const EditProduct = () => {
           </form>
         </div>
       ) : (
-        "k c"
+        ""
       )}
     </>
   );

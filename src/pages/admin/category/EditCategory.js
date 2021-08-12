@@ -2,50 +2,76 @@ import React, { useEffect, useState } from "react";
 import queryString from "query-string";
 import { useLocation, useHistory } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import categoryApi from "../../../api/categoryAPI";
 import { isAuthenticate } from "../../../auth";
-import { showError } from "../../../components/Alerts";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getById,
+  updateCategory,
+} from "../../../features/category/categorySlice";
+import imgLoading from "../../../image/Ajux_loader.gif";
+import Swal from "sweetalert2";
+import { unwrapResult } from "@reduxjs/toolkit";
 const EditCategory = () => {
   const { register, handleSubmit, reset } = useForm();
   const { id } = queryString.parse(useLocation().search);
-  const [category, setCategory] = useState("");
+  const { category, loading } = useSelector((state) => state.category);
+  const dispatch = useDispatch();
   const history = useHistory();
   const { token, user } = isAuthenticate();
-  const [error, setError] = useState("");
   const [urlImgPreview, setUrlImgPreview] = useState("");
   const onSelectFile = (e) => {
     setUrlImgPreview(URL.createObjectURL(e.target.files[0]));
   };
-  const updateCategory = async (category) => {
+  const update = async (data) => {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 3000,
+    });
     try {
-      await categoryApi.update(category, token, id, user._id);
+      const resultAction = await dispatch(
+        updateCategory({ data, token, id, userId: user._id })
+      );
+      unwrapResult(resultAction);
+      Toast.fire({
+        icon: "success",
+        title: "Sửa danh mục Thành công",
+      });
       history.push("/admin/category");
     } catch (error) {
-      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-      setError(error.response.data.error);
+      Toast.fire({
+        icon: "error",
+        title: error,
+      });
     }
   };
   useEffect(() => {
     const categoryEdit = async () => {
-      const { data } = await categoryApi.get(id);
-      const { photo, ...newCategory } = data;
-      setCategory(newCategory);
+      const x = await dispatch(getById(id));
+      const { photo, ...newCategory } = x.payload;
       reset(newCategory);
     };
     categoryEdit();
-  }, [reset, id]);
+  }, [reset, dispatch, id]);
   const onHandleSubmit = (data) => {
     const fd = new FormData();
     fd.append("name", data.name);
     if (data.photo.length > 0) {
       fd.append("photo", data.photo[0]);
     }
-    updateCategory(fd);
+
+    update(fd);
   };
   const photo = { ...register("photo") };
-  return (
+  return loading ? (
+    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 ">
+      <img className="w-28" src={imgLoading} alt="" />
+    </div>
+  ) : !category ? (
+    ""
+  ) : (
     <div className="w-full fade">
-      {error ? showError(error) : ""}
       <form onSubmit={handleSubmit(onHandleSubmit)}>
         <div className="grid bg-white rounded-lg shadow-xl">
           <div className="flex justify-center py-4">

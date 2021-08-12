@@ -40,7 +40,7 @@ const ToolbarMobile = () => {
           </svg>
         </div>
         <div className="toolbar-item-cart relative">
-          <div class="absolute rounded-full main-bg-active w-4 h-4 text-xs -top-1/3 -right-1/4 text-center text-white">
+          <div className="absolute rounded-full main-bg-active w-4 h-4 text-xs -top-1/3 -right-1/4 text-center text-white">
             1
           </div>
           <svg
@@ -59,7 +59,7 @@ const ToolbarMobile = () => {
           </svg>
         </div>
         <div className="toolbar-item-heart relative">
-          <div class="absolute rounded-full main-bg-active w-4 h-4 text-xs -top-1/3 -right-1/4 text-center text-white">
+          <div className="absolute rounded-full main-bg-active w-4 h-4 text-xs -top-1/3 -right-1/4 text-center text-white">
             0
           </div>
           <svg
@@ -77,7 +77,7 @@ const ToolbarMobile = () => {
             />
           </svg>
         </div>
-        <div class="toolbar-item-setting">
+        <div className="toolbar-item-setting">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-5 w-6 text-[#2c2c2c]"

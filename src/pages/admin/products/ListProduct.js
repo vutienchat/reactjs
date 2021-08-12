@@ -9,9 +9,12 @@ import queryString from "query-string";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchProducts,
+  removeProduct,
   removeProductRd,
 } from "../../../features/products/productSlice";
-// import { unwrapResult } from "@reduxjs/toolkit";
+import imgLoading from "../../../image/Ajux_loader.gif";
+import { unwrapResult } from "@reduxjs/toolkit";
+import Swal from "sweetalert2";
 const ListProduct = () => {
   const [filters, setFilters] = useState({ _limit: 5, _page: 1 });
   const [pagination, setPagination] = useState({
@@ -29,20 +32,40 @@ const ListProduct = () => {
     setFilters({ ...filters, _page: newPage });
   };
   const remove = async (id) => {
-    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-    try {
-      const { data } = await ProductApi.delete(token, id, user._id);
-      dispatch(removeProductRd(data._id));
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 3000,
+    });
 
-      // const newListProduct = listProduct.filter(
-      //   (product) => product._id !== id
-      // );
-      //   setListProduct(newListProduct);
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 2000);
-    } catch (error) {
-      setError(error.response.data.error);
-    }
+    Swal.fire({
+      title: "Bạn có chắc chắn không?",
+      text: "Sản Phẩm sẽ bị mất vĩnh viễn",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Đồng ý",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const resultAction = await dispatch(
+            removeProduct({ token, id, userId: user._id })
+          );
+          unwrapResult(resultAction);
+          Toast.fire({
+            icon: "success",
+            title: "Xóa sản phẩm Thành công",
+          });
+        } catch (error) {
+          Toast.fire({
+            icon: "error",
+            title: error,
+          });
+        }
+      }
+    });
   };
   useEffect(() => {
     const getListProduct = async () => {
@@ -63,13 +86,15 @@ const ListProduct = () => {
   return (
     <>
       {loading ? (
-        // <div className="bg-red-500 w-full h-full flex items-center justify-center">
-        <img
-          className="w-16 absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-1/2"
-          src="https://kif.info.pl/file/2018/12/lg.ring-loading-gif.gif"
-          alt=""
-        />
-      ) : listProduct.itemsList.length > 0 ? (
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 ">
+          <img className="w-28" src={imgLoading} alt="" />
+        </div>
+      ) : // <img
+      //   className="w-16 absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-1/2"
+      //   src="https://kif.info.pl/file/2018/12/lg.ring-loading-gif.gif"
+      //   alt=""
+      // />
+      listProduct.itemsList.length > 0 ? (
         <div className="w-full fade">
           {success ? showSuccess("Xóa sản phẩm thành công") : ""}
           {error ? showError(error) : ""}

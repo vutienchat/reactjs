@@ -10,7 +10,6 @@ const SelectCategory = (props) => {
     const getListCategory = async () => {
       const { data } = await categoryApi.getAll();
       setListCategory(data);
-      console.log("selected xong");
     };
     getListCategory();
     // }, [_id])

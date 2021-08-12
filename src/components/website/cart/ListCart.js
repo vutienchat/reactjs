@@ -1,8 +1,36 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { customName } from "../../../Util";
-const ListCart = (props) => {
-  const { listCart, removeCartItem } = props;
+import Swal from "sweetalert2";
+import {
+  countCart,
+  removeCart,
+  totalCart,
+} from "../../../features/cart/cartSlice";
+import { customName, setCartLocalStorage } from "../../../Util";
+const ListCart = () => {
+  const { listCart } = useSelector((state) => state.cart);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    setCartLocalStorage(listCart);
+    dispatch(countCart(listCart));
+    dispatch(totalCart(listCart));
+  }, [listCart]);
+  const removeCartItem = async (id) => {
+    try {
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+      });
+      await dispatch(removeCart(id));
+      Toast.fire({
+        icon: "success",
+        title: "Đã xóa sản phẩm khỏi giỏ hàng",
+      });
+    } catch (error) {}
+  };
   return (
     <div className="table_cart">
       <table className=" w-full text-center table-hover my-8">
@@ -25,7 +53,7 @@ const ListCart = (props) => {
                 <td className="flex justify-center">
                   <Link to={`/product/${cart._id}`}>
                     <img
-                      className="h-40 py-4 object-cover"
+                      className="h-40 py-4 object-cover fade"
                       src={`${process.env.REACT_APP_API_IMG_PRODUCT}/${cart._id}`}
                       alt=""
                     />
@@ -46,9 +74,9 @@ const ListCart = (props) => {
                         </div>
                         <input
                           data-id={cart._id}
-                          type="number"
+                          type="text"
                           value={cart.quantityCart}
-                          className="text-[#707070] text-xs md:text-base bg-transparent h-7 w-7 focus:outline-none pl-1.5"
+                          className="text-[#707070] text-xs md:text-base bg-transparent h-7 w-7 focus:outline-none text-center"
                           readOnly
                         />
                         <div

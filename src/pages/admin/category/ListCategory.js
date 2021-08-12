@@ -1,40 +1,67 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { showError, showSuccess } from "../../../components/Alerts";
-import categoryApi from "../../../api/categoryAPI";
 import { customName } from "../../../Util";
 import { isAuthenticate } from "../../../auth";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getListCategory,
+  removeCategory,
+} from "../../../features/category/categorySlice";
+import imgLoading from "../../../image/Ajux_loader.gif";
+import Image from "../../../components/website/Image";
+import Swal from "sweetalert2";
+import { unwrapResult } from "@reduxjs/toolkit";
 const ListCategory = () => {
-  const [listCategory, setListCategory] = useState([]);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
+  const { listCategory, loading } = useSelector((state) => state.category);
+  const dispatch = useDispatch();
+
   const { token, user } = isAuthenticate();
   useEffect(() => {
-    const getListCategory = async () => {
-      try {
-        const { data } = await categoryApi.getAll();
-        setListCategory(data);
-      } catch (error) {
-        console.log(error);
-      }
+    const getList = async () => {
+      dispatch(getListCategory());
     };
-    getListCategory();
+    getList();
   }, []);
   const remove = async (id) => {
-    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-    try {
-      await categoryApi.delete(token, id, user._id);
-      const newListCategory = listCategory.filter(
-        (category) => category._id !== id
-      );
-      setListCategory(newListCategory);
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 2000);
-    } catch (error) {
-      setError(error.response.data.error);
-    }
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 3000,
+    });
+    Swal.fire({
+      title: "Bạn có chắc chắn không?",
+      text: "Danh mục sẽ bị mất vĩnh viễn",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Đồng ý",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const resultAction = await dispatch(
+            removeCategory({ token, categoryId: id, userId: user._id })
+          );
+          const originalPromiseResult = unwrapResult(resultAction);
+          Toast.fire({
+            icon: "success",
+            title: "Xóa Thành công",
+          });
+        } catch (error) {
+          Toast.fire({
+            icon: "error",
+            title: error,
+          });
+        }
+      }
+    });
   };
-  return (
+  return loading ? (
+    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 ">
+      <img className="w-28" src={imgLoading} alt="" />
+    </div>
+  ) : listCategory && listCategory.length > 0 ? (
     <div className="w-full fade">
       <Link to="/admin/category/add">
         {" "}
@@ -45,8 +72,7 @@ const ListCategory = () => {
           Thêm Sản Phẩm
         </button>
       </Link>
-      {success ? showSuccess("Xóa danh mục thành công") : ""}
-      {error ? showError(error) : ""}
+
       <table className="min-w-max w-full table-auto text-center shadow-md box-border">
         <thead>
           <tr className="bg-white text-gray-600 uppercase text-sm leading-normal">
@@ -65,12 +91,17 @@ const ListCategory = () => {
               >
                 <td className="py-3 whitespace-nowrap font-medium">{i + 1}</td>
                 <td className="py-3 ">{customName(category.name)}</td>
-                <td className="py-3 flex justify-center">
-                  <img
+                <td className="py-3 flex justify-center ">
+                  <Image
+                    url={`${process.env.REACT_APP_API_IMG_CATEGORY}/${category._id}`}
+                    classname="w-20 h-24 object-cover fade"
+                  />
+
+                  {/* <img
                     className="w-20 h-24 object-cover"
                     src={`${process.env.REACT_APP_API_IMG_CATEGORY}/${category._id}`}
                     alt={category.name}
-                  />
+                  /> */}
                 </td>
                 <td className="py-3">
                   <div className="flex item-center justify-center">
@@ -99,7 +130,7 @@ const ListCategory = () => {
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 hover:text-blue-500 transform hover:scale-110 text-base"
+                        className=" h-5 w-5 hover:text-blue-500 transform hover:scale-110 text-base"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -120,6 +151,8 @@ const ListCategory = () => {
         </tbody>
       </table>
     </div>
+  ) : (
+    "NO PRODUCTS"
   );
 };
 
