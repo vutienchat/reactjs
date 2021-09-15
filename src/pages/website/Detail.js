@@ -209,7 +209,9 @@ const Detail = () => {
                     className=" border border-[#cebaa4]  text-[#cebaa4] hover:text-white hover:bg-[#cebaa4] h-14 w-14 flex cursor-pointer"
                     onClick={editQtyMinus}
                   >
-                    <span className="m-auto">-</span>
+                    <span className="m-auto">
+                      <i className="bi bi-dash"></i>
+                    </span>
                   </div>
                   <input
                     type="number"
@@ -223,7 +225,9 @@ const Detail = () => {
                     className=" border border-[#cebaa4]  text-[#cebaa4] hover:text-white hover:bg-[#cebaa4] h-14 w-14 flex  cursor-pointer"
                     onClick={editQtyplus}
                   >
-                    <span className="m-auto">+</span>
+                    <span className="m-auto">
+                      <i className="bi bi-plus"></i>
+                    </span>
                   </div>
                 </div>
               </div>

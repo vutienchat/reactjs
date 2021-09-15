@@ -25,7 +25,6 @@ const cartSlice = createSlice({
   },
   reducers: {
     countCart(state, actions) {
-      console.log(actions.payload);
       state.countCart = countCartLocalStorage(actions.payload);
     },
     totalCart(state, actions) {

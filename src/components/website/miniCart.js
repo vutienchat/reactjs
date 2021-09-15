@@ -20,7 +20,23 @@ const MiniCart = ({
   };
 
   const updateCart = (dataEdit, qtyEdit) => {
-    dispatch(editCart({ ...dataEdit, quantityCart: qtyEdit }));
+    if (qtyEdit == 1) {
+      if (dataEdit.quantityCart < dataEdit.quantity) {
+        console.log("quantityCart nhỏ hơn quantity");
+        dispatch(editCart({ ...dataEdit, quantityCart: qtyEdit }));
+      }
+    } else {
+      if (dataEdit.quantityCart > 1) {
+        console.log("quantityCart > 1");
+        dispatch(editCart({ ...dataEdit, quantityCart: qtyEdit }));
+      }
+    }
+    // if (dataEdit.quantityCart > 1) {
+    //   console.log({
+    //     quantityCart: dataEdit.quantityCart,
+    //     quantity: dataEdit.quantity,
+    //   });
+    // }
   };
 
   return (
@@ -88,7 +104,7 @@ const MiniCart = ({
                     className="mini-cart-item flex justify-between border-b py-3 border-gray-300"
                   >
                     <div className="cart-item-img w-16 h-20">
-                      <Link to="/">
+                      <Link to={`/product/4{cartItem._id}`}>
                         <img
                           src={`${process.env.REACT_APP_API_IMG_PRODUCT}/${cartItem._id}`}
                           className="w-16 h-20 object-cover"
@@ -122,7 +138,9 @@ const MiniCart = ({
                               data-id={cartItem._id}
                               className="text-[#cebaa4] hover:text-white hover:bg-[#cebaa4] h-7 w-7 text-center cursor-pointer"
                             >
-                              <span className="m-auto">-</span>
+                              <span className="leading-[28px]">
+                                <i className="bi bi-dash"></i>
+                              </span>
                             </div>
                             <input
                               data-id={cartItem._id}
@@ -136,7 +154,9 @@ const MiniCart = ({
                               onClick={() => updateCart(cartItem, 1)}
                               className="text-[#cebaa4] hover:text-white hover:bg-[#cebaa4] h-7 w-7 text-center  cursor-pointer"
                             >
-                              <span className="m-auto">+</span>
+                              <span className="leading-[28px]">
+                                <i className="bi bi-plus"></i>
+                              </span>
                             </div>
                           </div>
                         </span>
