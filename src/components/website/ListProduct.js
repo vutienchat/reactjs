@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
   customName,
@@ -10,9 +10,9 @@ import threeDot from "../../image/three-dots-black.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { addCart, countCart, totalCart } from "../../features/cart/cartSlice";
 import Swal from "sweetalert2";
-import { Link } from "react-router-dom";
 const ListProduct = ({ listProduct, onCart }) => {
   const { listCart, loading } = useSelector((state) => state.cart);
+  const [cartChoose, setCartChoose] = useState({});
   const dispatch = useDispatch();
   useEffect(() => {
     setCartLocalStorage(listCart);
@@ -20,9 +20,9 @@ const ListProduct = ({ listProduct, onCart }) => {
     dispatch(totalCart(listCart));
   }, [listCart]);
   const addItem = async (product) => {
+    setCartChoose(product);
     const quantityCart = 1;
     await dispatch(addCart({ ...product, quantityCart }));
-
     await Swal.fire({
       background: "#1a1d24",
       // showCloseButton: true,
@@ -93,7 +93,7 @@ const ListProduct = ({ listProduct, onCart }) => {
                         onClick={() => addItem(product)}
                         className="disabled:cursor-not-allowed cursor-pointer main-bg-active p-3 mx-0.5 hover:main-bg main-text hover:text-white transition duration-500 transform translate-y-full opacity-0  add-product focus:outline-none"
                       >
-                        {loading ? (
+                        {loading && cartChoose._id == product._id ? (
                           <svg
                             className="animate-spin h-5 w-5 text-white"
                             xmlns="http://www.w3.org/2000/svg"
